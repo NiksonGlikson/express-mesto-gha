@@ -1,9 +1,22 @@
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password
+  } = req.body;
 
-  User.create({ name, about, avatar })
+  User.create({
+    name,
+    about,
+    avatar,
+    email,
+    password
+  })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -64,5 +77,25 @@ module.exports.patchProfile = (req, res) => {
           .send({ message: "Переданы некорректные данные" });
       }
       return res.status(500).send({ message: err.message });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, { expiresIn: "7d" }, "super-secret-key");
+      res.cookie("jwt", token, {
+        maxAge: 3600000,
+        httpOnly: true,
+        sameSite: true,
+      });
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
     });
 };

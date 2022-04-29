@@ -15,6 +15,11 @@ mongoose.connect("mongodb://localhost:27017/mestodb", {
   useNewUrlParser: true,
 });
 
+const { login, createUser } = require("./controllers/users");
+
+app.post("/signin", login);
+app.post("/signup", createUser);
+
 app.use((req, res, next) => {
   req.user = {
     _id: "625d543a10b001d1b9731f8a",
