@@ -56,7 +56,13 @@ module.exports.likeCard = (req, res, next) => {
       }
       return res.send(card);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(new CastError("Некорректный id карточки"));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -71,5 +77,11 @@ module.exports.dislikeCard = (req, res, next) => {
       }
       return res.send(card);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(new CastError("Некорректный id карточки"));
+      } else {
+        next(err);
+      }
+    });
 };

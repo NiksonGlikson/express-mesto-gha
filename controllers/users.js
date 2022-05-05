@@ -61,7 +61,7 @@ module.exports.getUser = (req, res, next) => {
 
 module.exports.patchAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.send({ _id: user._id, avatar }))
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -73,7 +73,7 @@ module.exports.patchAvatar = (req, res, next) => {
 
 module.exports.patchProfile = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send({ _id: user._id, name, about }))
     .catch((err) => {
       if (err.name === "ValidationError") {
@@ -88,7 +88,7 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, { expiresIn: "7d" }, "some-secret-key");
+      const token = jwt.sign({ _id: user._id }, { expiresIn: "7d" }, "super-secret-key");
       res.cookie("jwt", token, {
         maxAge: 3600000,
         httpOnly: true,
