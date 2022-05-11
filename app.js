@@ -8,6 +8,8 @@ const cookieParser = require("cookie-parser");
 
 const { celebrate, Joi, errors } = require("celebrate");
 
+const { requestLogger, errorLogger } = require("./middlewares/logger");
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -25,6 +27,8 @@ const auth = require("./middlewares/auth");
 const CatcherError = require("./errors/CatcherError");
 const NotFoundError = require("./errors/NotFoundError");
 
+app.use(requestLogger);
+
 app.post("/signin", celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -41,14 +45,6 @@ app.post("/signup", celebrate({
   }),
 }), createUser);
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: "625d543a10b001d1b9731f8a",
-//   };
-
-//   next();
-// });
-
 app.use(auth);
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));
@@ -56,6 +52,8 @@ app.use("/cards", require("./routes/cards"));
 app.all("*", (req, res, next) => {
   next(new NotFoundError("По указанному пути ничего нет"));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 app.use(CatcherError);
