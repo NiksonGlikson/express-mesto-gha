@@ -1,7 +1,5 @@
 const express = require("express");
 
-const helmet = require("helmet");
-
 const mongoose = require("mongoose");
 
 const bodyParser = require("body-parser");
@@ -19,7 +17,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(helmet());
 
 mongoose.connect("mongodb://localhost:27017/mestodb", {
   useNewUrlParser: true,
@@ -34,14 +31,7 @@ const NotFoundError = require("./errors/NotFoundError");
 const allowedCors = [
   "https://praktikum.tk",
   "http://praktikum.tk",
-  "localhost:3000",
-  "https://localhost:3000",
-  "https://51.250.74.127:3000",
-  "https://domainname.glinkin.nomoredomains.xyz",
-  "https://localhost:3000",
-  "https://51.250.74.127:3000",
-  "http://domainname.glinkin.nomoredomains.xyz",
-  "http://localhost:3000"
+  "localhost:3000"
 ];
 
 app.use((req, res, next) => {
@@ -49,7 +39,6 @@ app.use((req, res, next) => {
   // проверяем, что источник запроса есть среди разрешённых
   if (allowedCors.includes(origin)) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Credentials", "*");
   }
 
   const { method } = req; // Сохраняем тип запроса (HTTP-метод) в соответствующую переменную
@@ -68,12 +57,6 @@ app.use((req, res, next) => {
 
 app.use(requestLogger);
 
-app.get("/crash-test", () => {
-  setTimeout(() => {
-    throw new Error("Сервер сейчас упадёт");
-  }, 0);
-});
-
 app.post("/signin", celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -91,6 +74,16 @@ app.post("/signup", celebrate({
 }), createUser);
 
 app.use(auth);
+
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Сервер сейчас упадёт");
+  }, 0);
+}); app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Сервер сейчас упадёт");
+  }, 0);
+});
 
 app.use("/users", require("./routes/users"));
 app.use("/cards", require("./routes/cards"));

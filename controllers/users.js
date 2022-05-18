@@ -4,9 +4,6 @@ const User = require("../models/user");
 const NotFoundError = require("../errors/NotFoundError");
 const ValidationError = require("../errors/ValidationError");
 const ConflictErrors = require("../errors/ConflictErrors");
-require("dotenv").config();
-
-const { JWT_SECRET_KEY } = process.env;
 
 module.exports.createUser = (req, res, next) => {
   const {
@@ -91,7 +88,7 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET_KEY, { expiresIn: "7d" });
+      const token = jwt.sign({ _id: user._id }, "super-secret-key", { expiresIn: "7d" });
       res.cookie("jwt", token, {
         maxAge: 3600000,
         httpOnly: true,
